@@ -34,6 +34,8 @@ namespace LinqFromScratch
          Console.WriteLine();
       }
 
+      // The aforementioned 7.5 bit:
+
       // C# gets in a strop dealing with ints as objects :(
       // Apart from the parameter type declaration this is absolutely identical to the one
       // above That has to be violating our DRY principles!

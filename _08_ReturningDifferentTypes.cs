@@ -36,9 +36,9 @@ namespace LinqFromScratch.V8
 
          Display.List(projectedType, "NewId, FirstName & LastName");
 
-         // As mentioned in the session, this is statically typed, not dynamic, the output
-         // will show the anonymous type being used, and hacking around this foreach loop
-         // will let you see the intellisense for the returned data.
+         // This is statically typed, not dynamic, the output will show the anonymous type
+         // being used, and hacking around this foreach loop will let you see the intellisense
+         // for the returned data.
          foreach (var funkyNewType in projectedType)
          {
             var intellisenseMeddling = funkyNewType.FirstName;

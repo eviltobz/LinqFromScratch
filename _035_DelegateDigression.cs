@@ -52,7 +52,7 @@ namespace LinqFromScratch
 
       // As mentioned, we can use the generic Action<T...> and Func<T...> for a lot of cases
       // and cut down on the number of declarations we make. But the signature becomes a
-      // little less clear, not just the proliference of generic types, but you can probably
+      // little less clear, not just the proliferation of generic types, but you can probably
       // deduce what a DisplayMessage delegate is intended for much more easily than an
       // Action<string>
       // LINQ relies on generics, the Where method's delegate is typed from the collection

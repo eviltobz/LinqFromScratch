@@ -143,8 +143,9 @@ namespace LinqFromScratch.V6
       // JustTheFirst method, it means that we can skip a lot of unneeded work in some cases.
 
       // The flip side to that is that there's a bunch of work to do each time we iterate
-      // over our IEnumerable, hence the resharper warnings. This could be particularly
-      // troublesome when using LINQ with Entity Framework or other such providers as each
-      // repeated set of iterations could result in all sorts of remote calls.
+      // over our IEnumerable, hence the resharper warnings you may have seen from time to
+      // time. This could be particularly troublesome when using LINQ with Entity Framework
+      // or other such providers as each repeated set of iterations could result in all
+      // sorts of remote calls.
    }
 }

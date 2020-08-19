@@ -74,7 +74,7 @@ namespace LinqFromScratch
 
       // Note, you can imagine how a lot of the same searches would be happening all over a
       // codebase. We could have a bunch of similar cut and paste methods with different
-      // criteria as another interim step, but there's no point to me coding that up to show.
+      // criteria, but there's no point to me coding that up to show.
 
       // All problems in computer science can be solved with an additional layer of indirection
       // (except too many layers of indirection). If we want to inject little bits of behaviour

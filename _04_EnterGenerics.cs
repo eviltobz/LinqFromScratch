@@ -32,8 +32,8 @@ namespace LinqFromScratch
       // generic T and making the delegate and method themselves generics
       public delegate bool ConditionChecker<T>(T item);
 
-      // We're still using a specific delegate to help track the language's evolution,
-      // but there are generic types in the BCL that would be a simple option.
+      // We're still using a specific delegate to show how small the change we need to
+      // make is, but there are generic types in the BCL that would be a simple option.
       //public IEnumerable<T> Filter<T>(IEnumerable<T> originalList, Func<T,bool> check)
       //public IEnumerable<T> Filter<T>(IEnumerable<T> originalList, Predicate<T> check)
       public IEnumerable<T> Filter<T>(IEnumerable<T> originalList, ConditionChecker<T> check)
@@ -52,9 +52,9 @@ namespace LinqFromScratch
 
       // So now we can call Filter(SomeCollection, BySomeCriteria), which is ok for a single
       // action but if you want to string things together the outside in approach looks nasty.
-      // Imagine we add ordering in a similar manner, we'd currently have to do something like:
+      // Imagine we add taking in a similar manner, we'd currently have to do something like:
 
-      // var bob = Order(Filter(collection, filterCriteria), orderCriteria);
+      // var bob = Take(Filter(collection, filterCriteria), 5);
 
       // Yuck. Linq gives us the nice fluent syntax that allows us to chain things together
       // nicely:

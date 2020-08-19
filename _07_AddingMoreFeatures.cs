@@ -51,7 +51,7 @@ namespace LinqFromScratch.V7
          int count = 0;
          // we're working with IEnumerables which don't have an index (and may be infinite)
          // so we need to keep iterating & counting, rather than going straight to an index
-         // LINQ is very programmer-friendly, but not always performance-frienldly
+         // LINQ is very programmer-friendly, but not always performance-friendly
          foreach (var item in originalList)
          {
             Console.WriteLine("In Skip: " + count);

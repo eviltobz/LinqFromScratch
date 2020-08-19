@@ -42,7 +42,6 @@ namespace LinqFromScratch
          return (Employee[])filteredList.ToArray(typeof(Employee));
       }
 
-
       public interface IEmployeeConditionChecker
       {
          bool IsMatch(Employee employee);
@@ -75,13 +74,13 @@ namespace LinqFromScratch
       }
 
       // Well, we now have a shiny new reusable method to inspect our collection,
-      // but fuck me if's not labourious to tweak search parameters.
+      // but fuck me if's not laborious to tweak search parameters.
 
       // This is an implementation of the Strategy design pattern... but it's a
       // bit too big and bulky for our little requirement here.
 
       // Creating an interface and then multiple implementations for such a trivial
-      // task is going to polute our namespaces with a lot of crap, and in the case
+      // task is going to pollute our namespaces with a lot of crap, and in the case
       // of the name checker we may have all sorts of subtle variations on how we
       // want to look for a condition: equals, contains, starts with, ends with...
 

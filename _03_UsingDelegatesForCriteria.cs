@@ -31,9 +31,10 @@ namespace LinqFromScratch
          Display.List(filteredList, "EmployeeId==3");
       }
 
+      // Instead of an interface, we now just have the delegate definition
       public delegate bool EmployeeConditionChecker(Employee employee);
 
-      // this hardly changes, the type in the method arguments changes from an interface to
+      // The method hardly changes, the type in the method arguments swaps from an interface to
       // a delegate...
       public Employee[] FilterEmployees(IEnumerable<Employee> originalList,
           EmployeeConditionChecker check)

@@ -11,7 +11,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>LinqFromScratch</RootNamespace>
     <AssemblyName>LinqFromScratch</AssemblyName>
-    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <TargetFrameworkProfile />
@@ -64,6 +64,10 @@
     <Compile Include="_05_ExtensionMethods.cs" />
     <Compile Include="_06_LazyEvaluation.cs" />
     <Compile Include="_09_ReturningDifferentOuterTypes.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="LICENSE.md" />
+    <None Include="README.md" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
