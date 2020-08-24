@@ -100,7 +100,9 @@ namespace LinqFromScratch.V9
          var first = SampleData.SortableData.ProperOrder(x => x.Item1);
          Display.List(first, "By Item1");
 
-         var second = SampleData.SortableData.ProperOrder(x => x.Item1).AndThen(x => x.Item2);
+         var second = SampleData.SortableData
+           .ProperOrder(x => x.Item1)
+           .AndThen(x => x.Item2);
          Display.List(second, "Then by Item2");
 
          // We don't have to keep chaining them inline mind, we can use those intermediate variables.
@@ -115,7 +117,27 @@ namespace LinqFromScratch.V9
          // And we've not changed the earlier intermediate variables
          Display.List(second, "And the one by Item2 is still the same");
       }
+
+      [TestMethod]
+      public void _6_VerboseOrdering()
+      {
+         BaseOrderedEnumerator<Tuple<int,int,int,int>>.Tracing = true;
+
+         var ordered = SampleData.SortableData
+           .ProperOrder(x => x.Item1)
+           .AndThen(x => x.Item2)
+           .AndThen(x => x.Item3);
+         Display.List(ordered, "Ordered by Items 1, 2, 3");
+
+         BaseOrderedEnumerator<Tuple<int,int,int,int>>.Tracing = false;
+      }
    }
+
+   // NOTE: This melts my brain every time I come back to it
+
+   // NOTE ALSO: There are probably a whole load of improvements that could be made to both the
+   // code quality & performance characteristics, but it get's the point across. Well, as long as
+   // the point is something like "Damn this is involved"
 
    // This quickly gets a LOT more complex than the previous parts. Our extension methods are nice
    // and simple, but then we're implementing new collection classes for them to interact with, and
@@ -163,12 +185,14 @@ namespace LinqFromScratch.V9
       }
       public static ProperOrderedCollection<T> Create(IEnumerable<T> original, IComparer<T> comparer)
       {
-         return new ProperOrderedCollection<T>(original, null, comparer);
+          Console.WriteLine("Creating ProperOrderedCollection");
+          return new ProperOrderedCollection<T>(original, null, comparer);
       }
 
       // This is the implementation of the method on the interface that the extension method calls
       public IOrderedEnumerable<T> CreateSubOrder(IComparer<T> comparer)
       {
+          Console.WriteLine("Creating SubOrder");
          return new ProperOrderedCollection<T>(null, this, comparer);
       }
 
@@ -177,6 +201,7 @@ namespace LinqFromScratch.V9
       // selector. This means that the field doesn't need to implement IComparable. (And there's a
       // descending flag too.) My partial implementation requiring an IComparable field reduces the
       // complexity a little.
+      // There's a different but similar IOrderedEnumerable in the BCL which LINQ uses
       public IOrderedEnumerable<T> CreateOrderedEnumerable<TKey>(Func<T, TKey> keySelector,
          IComparer<TKey> comparer, bool descending)
       {
@@ -186,6 +211,7 @@ namespace LinqFromScratch.V9
       IEnumerator IEnumerable.GetEnumerator() => throw new NotImplementedException();
       public IEnumerator<T> GetEnumerator()
       {
+         Console.WriteLine("Getting Enumerator");
          return GetOrderedEnumerator();
       }
 
@@ -204,7 +230,7 @@ namespace LinqFromScratch.V9
    // Whilst working on this, it became quite gnarly due to the code having to check if it was the
    // original IEnumerable, or a nested version. Any time that you are checking different fields &
    // making different choices, that's a sign that you may really have different, related classes.
-   // (Yes, the code instantiting these enumerators is doing that. But only in a single place, and
+   // (Yes, the code instantiating these enumerators is doing that. But only in a single place, and
    // something needs to make the choice somewhere)
    // So here we have a base class with some common code, then 2 different implementations of it
 
@@ -212,30 +238,40 @@ namespace LinqFromScratch.V9
    {
       public FirstOrderedEnumerator(IEnumerable<T> data, IComparer<T> comparer) : base(comparer)
       {
-         SortAndStoreParentData(data);
+          Trace("FirstOrderedEnumerator ctor");
+          ApplyThisLevelsOrderingToParentsCurrentBatch(data);
+          Console.WriteLine();
       }
 
-      internal override bool GetNextBatch() => BuildNextBatchFromSortedData();
+      internal override bool GetNextBatch()
+      {
+          Trace("FirstOrderedEnumerator.GetNextBatch");
+          return BuildNextBatchFromSortedData();
+      }
    }
 
    internal class NestedOrderedEnumerator<T> : BaseOrderedEnumerator<T>
    {
       private BaseOrderedEnumerator<T> parent;
 
-      public NestedOrderedEnumerator(BaseOrderedEnumerator<T> parent, IComparer<T> comparer) 
+      public NestedOrderedEnumerator(BaseOrderedEnumerator<T> parent, IComparer<T> comparer)
          : base(comparer)
       {
          this.parent = parent;
+         level = parent.level + 1;
+         Trace("NestedOrderedEnumerator ctor");
+         Console.WriteLine();
       }
 
       internal override bool GetNextBatch()
       {
+         Trace("NestedOrderedEnumerator.GetNextBatch");
          if (BuildNextBatchFromSortedData())
             return true;
 
          if (parent.GetNextBatch())
          {
-            SortAndStoreParentData(parent.CurrentBatchData);
+            ApplyThisLevelsOrderingToParentsCurrentBatch(parent.CurrentBatchData);
             BuildNextBatchFromSortedData();
             return true;
          }
@@ -259,14 +295,16 @@ namespace LinqFromScratch.V9
       // This, on the other hand, is a bunch more convoluted.
       public bool MoveNext()
       {
-         // Can we MoveNext in all the things in the same order position
+          // Try to MoveNext through things in the same order position
          if (CurrentBatchEnumerator.MoveNext())
          {
+            Trace("MoveNext - On current batch");
             Current = CurrentBatchEnumerator.Current;
             return true;
          }
 
-         // If not, can we get a group of items at the next ordered position, and MoveNext on that?
+         Trace("MoveNext - Getting next batch");
+         // If we can't, can we get a group of items at the next ordered position, and MoveNext on that?
          if (GetNextBatch())
             return MoveNext();
 
@@ -288,17 +326,21 @@ namespace LinqFromScratch.V9
          CurrentBatchEnumerator = new List<T>().GetEnumerator();
       }
 
-      protected void SortAndStoreParentData(IEnumerable<T> data)
+      protected void ApplyThisLevelsOrderingToParentsCurrentBatch(IEnumerable<T> data)
       {
          sorted = data.ToArray();
          Array.Sort(sorted, comparer);
          index = 0;
+         Trace($"ApplyThisLevelsOrderingToParentsCurrentBatch with {sorted.Length} items");
       }
 
       protected bool BuildNextBatchFromSortedData()
       {
          if (!HasDataToBuildBatch())
+         {
+            Trace($"BuildNextBatchFromSortedData has no data");
             return false;
+         }
 
          CurrentBatchData = new List<T>();
          var currentKey = sorted[index];
@@ -307,6 +349,7 @@ namespace LinqFromScratch.V9
             CurrentBatchData.Add(sorted[index]);
             index++;
          }
+         Trace($"BuildNextBatchFromSortedData with {CurrentBatchData.Count} items");
 
          CurrentBatchEnumerator = CurrentBatchData.GetEnumerator();
          return true;
@@ -319,6 +362,17 @@ namespace LinqFromScratch.V9
       private bool HasDataToBuildBatch() =>
          !(sorted is null)
          && index < sorted.Length;
+
+      public static bool Tracing { get; set; }
+      internal int level = 1;
+      protected void Trace(string message)
+      {
+          if (Tracing)
+          {
+              var padding = "".PadLeft(level * 2, ' ');
+              Console.WriteLine($"{padding}L:{level} - {message}");
+          }
+      }
    }
 
 
